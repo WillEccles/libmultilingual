@@ -1,3 +1,4 @@
+#define LIB_MULTI_WSTRING
 #include "../src/multilingual.h"
 #include <iostream>
 #include <string>
@@ -5,10 +6,10 @@
 void writekeys(multilingual::Translator& t) {
 	t.load();
 	std::cout << "Fell back? " << (t.fellback() ? "Yes.\n" : "No.\n");
-	std::cout << t.get("user.name") << '\n';
-	std::cout << t.get("user.age") << '\n';
-	std::cout << t["user.height"] << '\n';
-	std::cout << t.get("gb_key") << '\n';
+	std::wcout << t.get(L"user.name") << '\n';
+	std::wcout << t.get(L"user.age") << '\n';
+	std::wcout << t[LM_KEY(user.height)] << '\n';
+	std::wcout << t.get(L"gb_key") << '\n';
 }
 
 int main(void) {
@@ -30,15 +31,15 @@ int main(void) {
 	t.setlang("en_US");
 	t.setfallback("en_US");
 
-	std::string username = "";
-	std::string userage = "";
-	std::string userheight = "";
-	std::string gb_key = "";
+	local_string username = LMS("");
+	local_string userage = LMS("");
+	local_string userheight = LMS("");
+	local_string gb_key = LMS("");
 
 	lm_listener_array larr = {
-		{ username, "user.name" },
-		{ userage, "user.age" },
-		{ userheight, "user.height" }
+		{ username, LM_KEY(user.name) },
+		{ userage, LM_KEY(user.age) },
+		{ userheight, LM_KEY(user.height) }
 	};
 
 	t.setlisteners(larr);
@@ -49,14 +50,14 @@ int main(void) {
 
 	t.load();
 
-	std::cout << username << '\n' << userage << '\n' << userheight << '\n' << gb_key << '\n';
+	std::wcout << username << '\n' << userage << '\n' << userheight << '\n' << gb_key << '\n';
 
 	t.setdir("lang/");
 	t.setlang("en_GB");
 
 	t.load();
 
-	std::cout << username << '\n' << userage << '\n' << userheight << '\n' << gb_key << '\n';
+	std::wcout << username << '\n' << userage << '\n' << userheight << '\n' << gb_key << '\n';
 
 	return 0;
 }

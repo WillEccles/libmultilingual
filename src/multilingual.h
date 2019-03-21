@@ -8,10 +8,30 @@
 #include <string>
 #include <vector>
 
-// this is used to allow for a sort of tokenization
-// i.e. ML_KEY(myclass.name) directly translates to "myclass.name"
-// this is likely to be unused for 99% of usecases, but it's here
+// TODO: write README
+// TODO: split main code into another file, compile dylib
+// TODO: (maybe) allow for "categories" of some sort
+// TODO: allow for combining multiple languages into one dictionary
+
+// expands to the proper type of string constant
+// for example, LM_KEY("mykey") becomes either "mykey" or L"mykey"
+// recommended for use if you might use both wstring and string
+#ifdef LIB_MULTI_WSTRING
+#define LM_KEY(key) L###key
+#else
 #define LM_KEY(key) #key
+#endif
+
+// used to enable easy conversion to using wstring
+// use LMS("const char* stuff")
+// also works for wchar using LMC('c')
+#ifdef LIB_MULTI_WSTRING
+#define LMS(s) L##s
+#define LMC(c) L##c
+#else
+#define LMS(s) s
+#define LMC(c) c
+#endif
 
 typedef std::string	lm_lang_id;	// language type
 typedef std::string	lm_dir;	// directory type
@@ -25,6 +45,18 @@ typedef std::string		lm_str;
 typedef lm_str		lm_key;	// string dictionary key type
 typedef lm_str		lm_val;	// string dictionary value type
 
+// a general string type designed to replace explicit use of std::string or std::wstring
+// this is not used internatlly, it's just meant to be used for convenience
+typedef lm_str		local_string;
+
+#ifdef LIB_MULTI_WSTRING
+typedef std::wstringstream	lm_ss;
+typedef std::wifstream		lm_ifs;
+#else
+typedef std::stringstream	lm_ss;
+typedef std::ifstream		lm_ifs;
+#endif
+
 typedef std::map<lm_key, lm_val>	lm_dict;
 
 namespace multilingual {
@@ -37,6 +69,7 @@ namespace multilingual {
 typedef std::vector<multilingual::Listener>	lm_listener_array;
 
 namespace multilingual {
+	// class used to localize stuff
 	class Translator {
 	  private:
 		lm_dir		_dir = "./";
@@ -60,7 +93,7 @@ namespace multilingual {
 		// - returns the number of key/value pairs found
 		// - if update listeners are enabled, this will update them accordingly
 		// - throws std::runtime_error if neither the language file nor the fallback
-		// could be loaded.
+		//   could be loaded.
 		unsigned int load();
 
 		// set a new directory
@@ -102,14 +135,17 @@ namespace multilingual {
 
 		// whether or not the fallback language had to be used
 		bool fellback() const;
+
+		// returns whether or not the dictionary contains a given key
+		bool haskey(lm_key key) const;
 	};
 
 	namespace util {
-		inline lm_str& str_trim(std::string& s) {
+		inline lm_str& str_trim(lm_str& s) {
 			// trim right
-			s.erase(s.find_last_not_of(" ") + 1);
+			s.erase(s.find_last_not_of(LMS(" ")) + 1);
 			// trim left
-			s.erase(0, s.find_first_not_of(" "));
+			s.erase(0, s.find_first_not_of(LMS(" ")));
 			return s;
 		};
 	};
@@ -122,12 +158,12 @@ unsigned int MTrans::load() {
 	_fellback = false; // if this isn't the first time loading a language...
 	if (!_strvals.empty())
 		_strvals.clear();
-	std::ifstream infile(_dir + _lang + ".lang");
+	lm_ifs infile(_dir + _lang + ".lang");
 	if (!infile) {
 		if (_lang == _fallback)
 			throw std::runtime_error(_dir + _lang + ".lang could not be loaded.\n");
 
-		infile = std::ifstream(_dir + _fallback + ".lang");
+		infile = lm_ifs(_dir + _fallback + ".lang");
 		if (!infile) {
 			throw std::runtime_error("Neither " + _dir + _lang + ".lang nor " + _dir + _fallback + ".lang could be found.");
 		}
@@ -137,12 +173,12 @@ unsigned int MTrans::load() {
 
 	// load from the file
 	unsigned int count = 0;
-	std::string line, nkey, nval;
-	std::stringstream ss;
+	lm_str line, nkey, nval;
+	lm_ss ss;
 	while (std::getline(infile, line)) {
 		bool valid = false;
 		for (int i = 0; i < line.length(); i++) {
-			if (line[i] == '=') {
+			if (line[i] == LMC('=')) {
 				valid = true;
 				break;
 			}
@@ -150,23 +186,23 @@ unsigned int MTrans::load() {
 		if (!valid) continue;
 
 		// grab the key
-		ss = std::stringstream(line);
-		std::getline(ss, nkey, '=');
+		ss = lm_ss(line);
+		std::getline(ss, nkey, LMC('='));
 
 		// trim whitespace from the start and end of the key
 		// whitespace inside the key is not recommended
 		// it will be replaced with underscores
 		multilingual::util::str_trim(nkey);
 		for (std::size_t i = 0; i < nkey.length(); i++) {
-			if (nkey[i] == ' ')
-				nkey[i] = '_';
+			if (nkey[i] == LMC(' '))
+				nkey[i] = LMC('_');
 		}
 
 		if (nkey.empty())
 			continue;
 
 		// grab the value
-		std::getline(ss, nval, '\n');
+		std::getline(ss, nval, LMC('\n'));
 		
 		multilingual::util::str_trim(nval);
 
@@ -177,6 +213,8 @@ unsigned int MTrans::load() {
 
 		count++;
 	}
+
+	infile.close();
 
 	if (_updatelisteners)
 		update_listeners();
@@ -249,6 +287,15 @@ bool MTrans::disable_listeners() {
 
 bool MTrans::fellback() const {
 	return _fellback;
+};
+
+bool MTrans::haskey(lm_key key) const {
+	try {
+		lm_val r = _strvals.at(key);
+		return true;
+	} catch (const std::out_of_range& e) {
+		return false;
+	}
 };
 
 #undef MTrans
