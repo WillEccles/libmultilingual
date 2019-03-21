@@ -8,6 +8,11 @@
 #include <string>
 #include <vector>
 
+// this is used to allow for a sort of tokenization
+// i.e. ML_KEY(myclass.name) directly translates to "myclass.name"
+// this is likely to be unused for 99% of usecases, but it's here
+#define LM_KEY(key) #key
+
 typedef std::string	lm_lang_id;	// language type
 typedef std::string	lm_dir;	// directory type
 
@@ -81,6 +86,7 @@ namespace multilingual {
 
 		// add a new listener to the list
 		void addlistener(multilingual::Listener listener);
+		void addlistener(lm_val& str, lm_key key);
 
 		// force all listeners to be updated
 		// - returns false if listeners are disabled
@@ -209,6 +215,10 @@ void MTrans::setlisteners(lm_listener_array& listeners) {
 
 void MTrans::addlistener(multilingual::Listener listener) {
 	_listeners.push_back(listener);
+};
+
+void MTrans::addlistener(lm_val& str, lm_key key) {
+	_listeners.push_back({ str, key });
 };
 
 bool MTrans::update_listeners() {

@@ -33,30 +33,30 @@ int main(void) {
 	std::string username = "";
 	std::string userage = "";
 	std::string userheight = "";
-	std::string gbkey = "";
+	std::string gb_key = "";
 
 	lm_listener_array larr = {
 		{ username, "user.name" },
 		{ userage, "user.age" },
-		{ userheight, "user.height" },
+		{ userheight, "user.height" }
 	};
 
 	t.setlisteners(larr);
 
-	t.addlistener({ gbkey, "gb_key" });
+	t.addlistener(gb_key, LM_KEY(gb_key));
 
 	t.enable_listeners();
 
 	t.load();
 
-	std::cout << username << '\n' << userage << '\n' << userheight << '\n' << gbkey << '\n';
+	std::cout << username << '\n' << userage << '\n' << userheight << '\n' << gb_key << '\n';
 
 	t.setdir("lang/");
 	t.setlang("en_GB");
 
 	t.load();
 
-	std::cout << username << '\n' << userage << '\n' << userheight << '\n' << gbkey << '\n';
+	std::cout << username << '\n' << userage << '\n' << userheight << '\n' << gb_key << '\n';
 
 	return 0;
 }
