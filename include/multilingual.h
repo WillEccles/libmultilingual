@@ -10,6 +10,7 @@
 
 // TODO: (maybe) allow for "categories" of some sort
 // TODO: allow for combining multiple languages into one dictionary
+// TODO: replace precompiler flags with template class, then create dynamic library with CMake
 
 // expands to the proper type of string constant
 // for example, LM_KEY("mykey") becomes either "mykey" or L"mykey"
