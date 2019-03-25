@@ -1,5 +1,5 @@
 #define LIB_MULTI_WSTRING
-#include "../src/multilingual.h"
+#include "../include/multilingual.h"
 #include <iostream>
 #include <string>
 

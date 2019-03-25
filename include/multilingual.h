@@ -8,8 +8,6 @@
 #include <string>
 #include <vector>
 
-// TODO: write README
-// TODO: split main code into another file, compile dylib
 // TODO: (maybe) allow for "categories" of some sort
 // TODO: allow for combining multiple languages into one dictionary
 
@@ -139,22 +137,17 @@ namespace multilingual {
 		// returns whether or not the dictionary contains a given key
 		bool haskey(lm_key key) const;
 	};
-
-	namespace util {
-		inline lm_str& str_trim(lm_str& s) {
-			// trim right
-			s.erase(s.find_last_not_of(LMS(" ")) + 1);
-			// trim left
-			s.erase(0, s.find_first_not_of(LMS(" ")));
-			return s;
-		};
-	};
 };
 
-// UNDEF THIS AT THE END!!!
-#define MTrans multilingual::Translator
+inline lm_str& str_trim(lm_str& s) {
+	// trim right
+	s.erase(s.find_last_not_of(LMS(" ")) + 1);
+	// trim left
+	s.erase(0, s.find_first_not_of(LMS(" ")));
+	return s;
+};
 
-unsigned int MTrans::load() {
+unsigned int multilingual::Translator::load() {
 	_fellback = false; // if this isn't the first time loading a language...
 	if (!_strvals.empty())
 		_strvals.clear();
@@ -192,7 +185,7 @@ unsigned int MTrans::load() {
 		// trim whitespace from the start and end of the key
 		// whitespace inside the key is not recommended
 		// it will be replaced with underscores
-		multilingual::util::str_trim(nkey);
+		str_trim(nkey);
 		for (std::size_t i = 0; i < nkey.length(); i++) {
 			if (nkey[i] == LMC(' '))
 				nkey[i] = LMC('_');
@@ -204,7 +197,7 @@ unsigned int MTrans::load() {
 		// grab the value
 		std::getline(ss, nval, LMC('\n'));
 		
-		multilingual::util::str_trim(nval);
+		str_trim(nval);
 
 		_strvals[nkey] = nval;
 
@@ -222,19 +215,19 @@ unsigned int MTrans::load() {
 	return count;
 };
 
-void MTrans::setdir(lm_dir newdir) {
+void multilingual::Translator::setdir(lm_dir newdir) {
 	_dir = newdir;
 };
 
-void MTrans::setfallback(lm_lang_id newlang) {
+void multilingual::Translator::setfallback(lm_lang_id newlang) {
 	_fallback = newlang;
 };
 
-void MTrans::setlang(lm_lang_id language) {
+void multilingual::Translator::setlang(lm_lang_id language) {
 	_lang = language;
 };
 
-lm_val MTrans::get(lm_key key) const {
+lm_val multilingual::Translator::get(lm_key key) const {
 	try {
 		return _strvals.at(key);
 	} catch (const std::out_of_range& e) {
@@ -242,24 +235,24 @@ lm_val MTrans::get(lm_key key) const {
 	}
 };
 
-lm_val MTrans::operator[] (lm_key key) const {
+lm_val multilingual::Translator::operator[] (lm_key key) const {
 	return get(key);
 };
 
-void MTrans::setlisteners(lm_listener_array& listeners) {
+void multilingual::Translator::setlisteners(lm_listener_array& listeners) {
 	_listeners = lm_listener_array(listeners);
 	_updatelisteners = true;
 };
 
-void MTrans::addlistener(multilingual::Listener listener) {
+void multilingual::Translator::addlistener(multilingual::Listener listener) {
 	_listeners.push_back(listener);
 };
 
-void MTrans::addlistener(lm_val& str, lm_key key) {
+void multilingual::Translator::addlistener(lm_val& str, lm_key key) {
 	_listeners.push_back({ str, key });
 };
 
-bool MTrans::update_listeners() {
+bool multilingual::Translator::update_listeners() {
 	if (!_updatelisteners) return false;
 
 	for (auto& l : _listeners) {
@@ -269,7 +262,7 @@ bool MTrans::update_listeners() {
 	return true;
 };
 
-bool MTrans::enable_listeners() {
+bool multilingual::Translator::enable_listeners() {
 	if (_updatelisteners) return false;
 
 	_updatelisteners = true;
@@ -277,7 +270,7 @@ bool MTrans::enable_listeners() {
 	return true;
 };
 
-bool MTrans::disable_listeners() {
+bool multilingual::Translator::disable_listeners() {
 	if (!_updatelisteners) return false;
 	
 	_updatelisteners = false;
@@ -285,11 +278,11 @@ bool MTrans::disable_listeners() {
 	return true;
 };
 
-bool MTrans::fellback() const {
+bool multilingual::Translator::fellback() const {
 	return _fellback;
 };
 
-bool MTrans::haskey(lm_key key) const {
+bool multilingual::Translator::haskey(lm_key key) const {
 	try {
 		lm_val r = _strvals.at(key);
 		return true;
@@ -297,7 +290,5 @@ bool MTrans::haskey(lm_key key) const {
 		return false;
 	}
 };
-
-#undef MTrans
 
 #endif
