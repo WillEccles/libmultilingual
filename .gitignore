@@ -1,3 +1,4 @@
 build/
 test/a.out
 test/test.out
+*.swp

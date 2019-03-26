@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(multilingual SHARED src/Translator.cpp)
+add_library(multilingual SHARED src/Translator.cpp src/TranslatorTypes.cpp)
 
 set_target_properties(multilingual PROPERTIES
     VERSION ${PROJECT_VERSION}

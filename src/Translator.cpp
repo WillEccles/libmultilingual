@@ -171,8 +171,4 @@ bool multilingual::basic_translator<_str>::haskey(T_TYPE(key_t) key) const {
 	}
 };
 
-// template instantiations
-template class multilingual::basic_translator<std::string>;
-template class multilingual::basic_translator<std::wstring>;
-
 #undef T_TYPE
