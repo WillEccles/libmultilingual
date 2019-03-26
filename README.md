@@ -1,6 +1,8 @@
 # libmultilingual
 
-This is a very simple (mostly proof-of-concept) C++11 library for localizing strings. Operation is fairly simple, and compiling is simple since it's (for the moment) header-only.
+This is a very simple C++11 library for localizing strings.
+
+There is one main class used to handle all localizations. This class handles everything from loading `.lang` files to accessing and reloading them. You may switch language at any time, and strings may be set up as listeners which will be changed whenever the language is changed. This is likely a niche use-case, but it's there if you need it.
 
 ## Compilation
 
