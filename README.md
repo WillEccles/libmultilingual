@@ -4,10 +4,24 @@ This is a very simple (mostly proof-of-concept) C++11 library for localizing str
 
 ## Compilation
 
-Because this library supports either `std::string` or `std::wstring` based on precompiler flags, it is (for the moment) header-only. Therefore, there is no compilation for the library itself. Simply include the header and compile your program.
+In order to compile and install this library, do the following:
+
+```
+$ mkdir build && cd build
+$ cmake ..
+$ sudo make install
+```
+
+This will install the library and header at your default locations as determined by CMake.
+
+## Linking
+
+In order to link this library, a pkgconfig has been included. Use the shell command `pkg-config --libs --cflags multilingual` to get the compiler arguments you should specify to link this library. Then, simply `#include "multilingual.h"` and you are good to go.
+
+For an example on how to do this using a Makefile, see the [test Makefile](test/Makefile).
 
 ## Usage
 
-Use the class `multilingual::Translator` to get strings from a file and localize them. There are convenience macros used for putting C++ tokens into strings for use in keys, and it has support for `std::wstring` and `wchar_t` (before including the header, `#define LIB_MULTI_WSTRING`).
+*There is [test code](test/test.cpp) available for your reading pleasure.*
 
-The code is fairly self-explanatory, and since it's not meant to be a huge library, there is little documentation at the moment. Read through the header and the `Translator` class declaration in particular for handy comments, and read the [test code](test/test.cpp) for example usage.
+The main translator template class is `multilingual::basic_translator`. While you may use this template yourself, I recommend using one of the typedefs provided: `Translator` and `WTranslator`. `Translator` is a version of `basic_translator` that is instantiated to use `std::string`, and `WTranslator` is a version of `basic_translator` that is instantiated to use `std::wstring`. All functions will work for either type. Read through the test code for an example on how to use these classes.
