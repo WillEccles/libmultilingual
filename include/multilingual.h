@@ -8,9 +8,6 @@
 #include <string>
 #include <vector>
 
-// TODO: (maybe) allow for "categories" of some sort
-// TODO: allow for combining multiple languages into one dictionary
-
 // expands to the proper type of string constant
 // for example, LM_KEY(class.member) becomes "class.member"
 // also, LM_WKEY(class.member) becomes L"class.member"
